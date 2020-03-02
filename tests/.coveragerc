@@ -2,6 +2,9 @@
 
 branch = True
 
+omit =
+    */__init__.py
+
 [report]
 
 sort = Cover
