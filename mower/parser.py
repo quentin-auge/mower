@@ -1,10 +1,17 @@
 import io
-from typing import Tuple
+from typing import List, Tuple
 
 
 class Parser:
     """
-    Parse mower moves specification file.
+    Parse mower moves specification file:
+      * grid size on first line (2 space-separated ints)
+      * then, an alternance:
+        * mower initial position (2 space-separated ints) and initial orientation (N/S/W/E char)
+          line
+        * mower moves (L/R/F chars) line
+
+    Handle parsing errors by raising :exception:`ValueError` with relevant error messages.
     """
 
     def __init__(self, stream: io.TextIOBase):
@@ -16,17 +23,42 @@ class Parser:
         """
         self.stream = stream
 
+    def parse_grid_size(self) -> complex:
+        """
+        Consume first line of stream to get grid size (2 space-separated ints -> complex).
+        """
+        line = self._readline()
+        grid_size = self._parse_grid_size_line(line)
+        return grid_size
+
+    def parse_mowers(self) -> List[Tuple[complex, complex, str]]:
+        """
+        Consume remaining lines of stream to get mowers initial position (2 space-separated ints
+        -> complex), initial orientation (N/S/W/E char -> complex) and moves (L/R/F chars).
+        """
+
+        mowers = []
+
+        line = self._readline()
+
+        while line:
+            position, orientation = self._parse_initial_position_line(line)
+
+            line = self._readline()
+            moves = self._parse_moves_line(line)
+
+            mowers.append((position, orientation, moves))
+
+            line = self._readline()
+
+        return mowers
+
     def _readline(self) -> str:
         """
         Read new line from the stream.
         """
         line = self.stream.readline().strip()
         return line
-
-    def parse_grid_size(self) -> complex:
-        line = self._readline()
-        grid_size = self._parse_grid_size_line(line)
-        return grid_size
 
     def _parse_grid_size_line(self, line) -> complex:
         """

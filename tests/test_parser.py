@@ -1,3 +1,5 @@
+import io
+
 import pytest
 
 from mower.parser import Parser
@@ -79,3 +81,67 @@ def test_parse_initial_position_line(line, expected):
 ])
 def test_parse_moves_line(line, expected):
     expect_value_or_exception('_parse_moves_line', line, expected=expected)
+
+
+def test_parse_grid_size_from_stream():
+    sample_input = '''5 5
+    1 2 N
+    LFLFLFLFF
+    '''
+    parser = Parser(io.StringIO(sample_input))
+    assert parser.parse_grid_size() == complex(5, 5)
+
+def test_parse_zero_mower_from_stream():
+    parser = Parser(io.StringIO())
+
+    actual_mowers = parser.parse_mowers()
+    expected_mowers = []
+
+    assert actual_mowers == expected_mowers
+
+def test_parse_all_mower_from_stream():
+    sample_input = '''1 2 N
+    LFLFLFLFF
+    3 3 E
+    FFRFFRFRRF
+    '''
+
+    parser = Parser(io.StringIO(sample_input))
+
+    actual_mowers = parser.parse_mowers()
+    expected_mowers = [
+        (complex(1, 2), complex(0, 1), 'LFLFLFLFF'),
+        (complex(3, 3), complex(1, 0), 'FFRFFRFRRF')
+    ]
+
+    assert actual_mowers == expected_mowers
+
+def test_parse_one_mower_from_stream():
+    sample_input = '''1 2 N
+    LFLFLFLFF
+    '''
+
+    parser = Parser(io.StringIO(sample_input))
+
+    actual_mowers = parser.parse_mowers()
+    expected_mowers = [
+        (complex(1, 2), complex(0, 1), 'LFLFLFLFF')
+    ]
+
+    assert actual_mowers == expected_mowers
+
+def test_parse_incomplete_mower_from_stream():
+    sample_input = '''1 2 N
+    LFLFLFLFF
+    3 3 E
+    '''
+
+    parser = Parser(io.StringIO(sample_input))
+
+    actual_mowers = parser.parse_mowers()
+    expected_mowers = [
+        (complex(1, 2), complex(0, 1), 'LFLFLFLFF'),
+        (complex(3, 3), complex(1, 0), '')
+    ]
+
+    assert actual_mowers == expected_mowers
