@@ -1,1 +1,6 @@
+.coverage
 .idea/
+.tox/
+.venv/
+__pycache__/
+mower.egg-info/

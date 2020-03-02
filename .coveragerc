@@ -1,0 +1,15 @@
+[run]
+
+branch = True
+
+[report]
+
+sort = Cover
+
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Exclude main
+    def main
+    if __name__ == '__main__'
