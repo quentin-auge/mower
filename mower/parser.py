@@ -86,3 +86,27 @@ class Parser:
             raise ValueError(msg)
 
         return orientation
+
+    def _parse_moves_line(self, line: str) -> str:
+        """
+        Validate and return moves specification (concatenated one-char moves).
+        """
+        try:
+            moves = ''.join(self._parse_move(move) for move in line)
+        except ValueError:
+            raise ValueError(f'Invalid moves: {line}')
+
+        return moves
+
+    def _parse_move(self, token: str) -> str:
+        """
+        Validate and return a move (L/R/F char).
+        """
+
+        valid_move_tokens = 'LRF'
+
+        if token not in valid_move_tokens:
+            msg = f'Invalid move token: {token}; not one of {list(valid_move_tokens)}'
+            raise ValueError(msg)
+
+        return token

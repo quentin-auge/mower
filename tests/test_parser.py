@@ -43,6 +43,16 @@ def test_parse_orientation(token, expected):
     expect_value_or_exception('_parse_orientation', token, expected=expected)
 
 
+@pytest.mark.parametrize('token, expected', [
+    pytest.param('L', complex(0, 1), id='valid_left'),
+    pytest.param('R', complex(0, -1), id='valid_right'),
+    pytest.param('F', complex(-1, 0), id='valid_forward'),
+    pytest.param('X', ValueError('Invalid move'), id='invalid_one_char')
+])
+def test_parse_move(token, expected):
+    expect_value_or_exception('_parse_move', token, expected=expected)
+
+
 @pytest.mark.parametrize('line, expected', [
     pytest.param('-15 22', complex(-15, 22), id='valid'),
     pytest.param('1', ValueError('Invalid grid size'), id='invalid_single_value'),
@@ -59,3 +69,13 @@ def test_parse_grid_size_line(line, expected):
 ])
 def test_parse_initial_position_line(line, expected):
     expect_value_or_exception('_parse_initial_position_line', line, expected=expected)
+
+
+@pytest.mark.parametrize('line, expected', [
+    pytest.param(r'', '', id='valid_empty_string'),
+    pytest.param('L', 'L', id='valid_one_char'),
+    pytest.param('RFLLRF', 'RFLLRF', id='valid_multiple_chars'),
+    pytest.param('RFLXLRF', ValueError('Invalid move'), id='invalid_move')
+])
+def test_parse_moves_line(line, expected):
+    expect_value_or_exception('_parse_moves_line', line, expected=expected)
