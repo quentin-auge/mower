@@ -17,7 +17,7 @@ def expect_value_or_exception(method, *args, expected):
             run_method()
     else:
         # Expect a value
-        assert run_method()
+        assert run_method() == expected
 
 
 @pytest.mark.parametrize('x, y, expected', [
@@ -44,9 +44,9 @@ def test_parse_orientation(token, expected):
 
 
 @pytest.mark.parametrize('token, expected', [
-    pytest.param('L', complex(0, 1), id='valid_left'),
-    pytest.param('R', complex(0, -1), id='valid_right'),
-    pytest.param('F', complex(-1, 0), id='valid_forward'),
+    pytest.param('L', 'L', id='valid_left'),
+    pytest.param('R', 'R', id='valid_right'),
+    pytest.param('F', 'F', id='valid_forward'),
     pytest.param('X', ValueError('Invalid move'), id='invalid_one_char')
 ])
 def test_parse_move(token, expected):
@@ -63,7 +63,7 @@ def test_parse_grid_size_line(line, expected):
 
 
 @pytest.mark.parametrize('line, expected', [
-    pytest.param('-15 22 W', complex(-15, 22), id='valid'),
+    pytest.param('-15 22 W', (complex(-15, 22), complex(-1, 0)), id='valid'),
     pytest.param('1', ValueError('Invalid initial position'), id='invalid_two_values'),
     pytest.param('1 2 W 0', ValueError('Invalid initial position'), id='invalid_four_values')
 ])
