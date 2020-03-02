@@ -2,24 +2,24 @@ import io
 
 import pytest
 
-from mower.parser import Parser
+import mower.parser
 
 
-def expect_value_or_exception(method, *args, expected):
+def expect_value_or_exception(func, *args, expected):
     """
-    Run a given method of class :class:`Parser` with some args.
+    Run a given function of module :module:`mower.parser` with some args.
     Expect either a value or an exception.
     """
 
-    run_method = lambda: getattr(Parser(None), method)(*args)
+    run_func = lambda: getattr(mower.parser, func)(*args)
 
     if isinstance(expected, Exception):
         # Expect an exception
         with pytest.raises(type(expected), match=str(expected)):
-            run_method()
+            run_func()
     else:
         # Expect a value
-        assert run_method() == expected
+        assert run_func() == expected
 
 
 @pytest.mark.parametrize('x, y, expected', [
@@ -88,16 +88,18 @@ def test_parse_grid_size_from_stream():
     1 2 N
     LFLFLFLFF
     '''
-    parser = Parser(io.StringIO(sample_input))
-    assert parser.parse_grid_size() == complex(5, 5)
+    stream = io.StringIO(sample_input)
+    assert mower.parser.parse_grid_size(stream) == complex(5, 5)
+
 
 def test_parse_zero_mower_from_stream():
-    parser = Parser(io.StringIO())
+    stream = io.StringIO()
 
-    actual_mowers = parser.parse_mowers()
+    actual_mowers = mower.parser.parse_mowers(stream)
     expected_mowers = []
 
     assert actual_mowers == expected_mowers
+
 
 def test_parse_all_mower_from_stream():
     sample_input = '''1 2 N
@@ -106,9 +108,9 @@ def test_parse_all_mower_from_stream():
     FFRFFRFRRF
     '''
 
-    parser = Parser(io.StringIO(sample_input))
+    stream = io.StringIO(sample_input)
 
-    actual_mowers = parser.parse_mowers()
+    actual_mowers = mower.parser.parse_mowers(stream)
     expected_mowers = [
         (complex(1, 2), complex(0, 1), 'LFLFLFLFF'),
         (complex(3, 3), complex(1, 0), 'FFRFFRFRRF')
@@ -116,19 +118,21 @@ def test_parse_all_mower_from_stream():
 
     assert actual_mowers == expected_mowers
 
+
 def test_parse_one_mower_from_stream():
     sample_input = '''1 2 N
     LFLFLFLFF
     '''
 
-    parser = Parser(io.StringIO(sample_input))
+    stream = io.StringIO(sample_input)
 
-    actual_mowers = parser.parse_mowers()
+    actual_mowers = mower.parser.parse_mowers(stream)
     expected_mowers = [
         (complex(1, 2), complex(0, 1), 'LFLFLFLFF')
     ]
 
     assert actual_mowers == expected_mowers
+
 
 def test_parse_incomplete_mower_from_stream():
     sample_input = '''1 2 N
@@ -136,9 +140,9 @@ def test_parse_incomplete_mower_from_stream():
     3 3 E
     '''
 
-    parser = Parser(io.StringIO(sample_input))
+    stream = io.StringIO(sample_input)
 
-    actual_mowers = parser.parse_mowers()
+    actual_mowers = mower.parser.parse_mowers(stream)
     expected_mowers = [
         (complex(1, 2), complex(0, 1), 'LFLFLFLFF'),
         (complex(3, 3), complex(1, 0), '')
