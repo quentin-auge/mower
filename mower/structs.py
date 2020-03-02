@@ -6,17 +6,11 @@ from typing import Union
 
 class Position:
     """
-    A pretty-printable structure that encapsulates a cartesian-coordinates position.
+    A pretty-printable structure that encapsulates a cartesian-coordinates position and operates
+    upon it.
     """
 
     def __init__(self, x: Union[str, int], y: Union[str, int]):
-
-        try:
-            x, y = int(x), int(y)
-        except ValueError:
-            msg = f'Invalid position: "{(x, y)}", must be integers'
-            raise ValueError(msg)
-
         self._position = complex(x, y)
 
     @property
@@ -33,7 +27,7 @@ class Position:
 
 class Orientation:
     """
-    A pretty-printable structure that encapsulates a N/S/W/E orientation.
+    A pretty-printable structure that encapsulates a N/S/W/E orientation and operates upon it.
     """
 
     orientation_to_complex = {

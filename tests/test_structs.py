@@ -3,42 +3,10 @@ import pytest
 from mower.structs import Orientation, Position
 
 
-def expect_value_or_exception(cls, *args, expected):
-    """
-    Initialize a given struct of module :module:`mower.structs` with some args.
-    Expect either a successful initialization or an exception.
-    """
-
-    init_object = lambda: cls(*args)
-
-    if isinstance(expected, Exception):
-        # Expect an exception
-        with pytest.raises(type(expected), match=str(expected)):
-            init_object()
-    else:
-        # Expect a successful initialization
-        assert isinstance(init_object(), expected)
-
-
-@pytest.mark.parametrize('x, y, expected', [
-    pytest.param(-7, 8, complex(-7, 8), id='valid_int'),
-    pytest.param('-15', '22', complex(-15, 22), id='valid_string'),
-    pytest.param('-22', 15, complex(-22, 15), id='valid_mixed_int_string'),
-    pytest.param(9, '', ValueError('Invalid position'), id='invalid_empty_string'),
-    pytest.param('19b', 3, ValueError('Invalid position'), id='invalid_string'),
-    pytest.param('1.4', '3', ValueError('Invalid position'), id='invalid_float')
-])
-def test_init_position(x, y, expected):
-    if isinstance(expected, Exception):
-        # Expect an exception
-        with pytest.raises(type(expected), match=str(expected)):
-            position = Position(x, y)
-            print(position)
-    else:
-        # Expect a successful initialization with the right attributes
-        position = Position(x, y)
-        assert position._position == expected
-        assert complex(position.x, position.y) == expected
+def test_init_position():
+    position = Position(-7, 8)
+    assert position._position == complex(-7, 8)
+    assert (position.x, position.y) == (-7, 8)
 
 
 def test_str_position():
