@@ -1,6 +1,6 @@
 # coding: utf8
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(name='mower',
       version='0.1',
@@ -8,7 +8,7 @@ setup(name='mower',
       author='Quentin Augé',
       author_email='quentin.auge@gmail.com',
       license='closed',
-      py_modules=['mower'],
+      packages=find_packages(),
 
       python_requires='>=3.6',
 
@@ -22,6 +22,6 @@ setup(name='mower',
 
       entry_points={
           'console_scripts': [
-              'mower = mower:main'
+              'mower = mower.mower:main'
           ]
       })
