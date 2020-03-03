@@ -31,6 +31,22 @@ def test_forward_position(orientation, dst_position):
     assert (position.x, position.y) == dst_position
 
 
+@pytest.mark.parametrize('src_position, grid_size, dst_position', [
+    pytest.param((0, 0), (10, 5), (0, 0), id='valid_bottom_left_corner'),
+    pytest.param((0, 4), (10, 5), (0, 4), id='valid_top_left_corner'),
+    pytest.param((9, 4), (10, 5), (9, 4), id='valid_top_right_corner'),
+    pytest.param((9, 0), (10, 5), (9, 0), id='valid_bottom_right_corner'),
+    pytest.param((0, -1), (10, 5), (0, 0), id='invalid_bottom'),
+    pytest.param((-1, 4), (10, 5), (0, 4), id='invalid_left'),
+    pytest.param((9, 5), (10, 5), (9, 4), id='invalid_top'),
+    pytest.param((10, 0), (10, 5), (9, 0), id='invalid_right')
+])
+def test_restrict_position_to_grid(src_position, grid_size, dst_position):
+    position = Position(*src_position)
+    position.restrict_to_grid(grid_size)
+    assert (position.x, position.y) == dst_position
+
+
 @pytest.mark.parametrize('orientation, expected', [
     pytest.param('N', complex(0, 1), id='valid_north'),
     pytest.param('S', complex(0, -1), id='valid_south'),
@@ -97,17 +113,21 @@ def test_str_mower():
     assert str(mower) == '8 9 W'
 
 
-@pytest.mark.parametrize('src_position, grid_size, dst_position', [
-    pytest.param((0, 0), (10, 5), (0, 0), id='valid_bottom_left_corner'),
-    pytest.param((0, 4), (10, 5), (0, 4), id='valid_top_left_corner'),
-    pytest.param((9, 4), (10, 5), (9, 4), id='valid_top_right_corner'),
-    pytest.param((9, 0), (10, 5), (9, 0), id='valid_bottom_right_corner'),
-    pytest.param((0, -1), (10, 5), (0, 0), id='invalid_bottom'),
-    pytest.param((-1, 4), (10, 5), (0, 4), id='invalid_left'),
-    pytest.param((9, 5), (10, 5), (9, 4), id='invalid_top'),
-    pytest.param((10, 0), (10, 5), (9, 0), id='invalid_right')
+@pytest.mark.parametrize('move, rotate_left_calls, rotate_right_calls, forward_calls', [
+    pytest.param('L', 1, 0, 0, id='rotate_left'),
+    pytest.param('R', 0, 1, 0, id='rotate_right'),
+    pytest.param('F', 0, 0, 1, id='forward')
 ])
-def test_restrict_position_to_grid(src_position, grid_size, dst_position):
-    position = Position(*src_position)
-    position.restrict_to_grid(grid_size)
-    assert (position.x, position.y) == dst_position
+def test_step_mower(move, rotate_left_calls, rotate_right_calls, forward_calls):
+    position = Position(8, 9)
+    orientation = Orientation('W')
+    mower = Mower(position, orientation, grid_size=(10, 10))
+
+    with mock.patch.object(orientation, 'rotate_left') as rotate_left:
+        with mock.patch.object(orientation, 'rotate_right') as rotate_right:
+            with mock.patch.object(position, 'forward') as forward:
+                mower.step(move)
+
+                assert rotate_left.call_count == rotate_left_calls
+                assert rotate_right.call_count == rotate_right_calls
+                assert forward.call_count == forward_calls

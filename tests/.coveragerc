@@ -17,3 +17,5 @@ exclude_lines =
     # Exclude main
     def main
     if __name__ == '__main__'
+
+    raise NotImplementedError

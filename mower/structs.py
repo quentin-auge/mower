@@ -111,5 +111,18 @@ class Mower:
     def orientation(self):
         return self._orientation.orientation
 
+    def step(self, move: str):
+        """
+        Apply move (L/R/F char) to mower.
+        """
+        if move == 'L':
+            self._orientation.rotate_left()
+        elif move == 'R':
+            self._orientation.rotate_right()
+        elif move == 'F':
+            self._position.forward(self._orientation, self._grid_size)
+        else:
+            raise NotImplementedError(f'Invalid move: "{move}"')
+
     def __str__(self):
         return f'{self._position} {self._orientation}'

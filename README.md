@@ -6,9 +6,6 @@ It is an implementation of a company's technical test.
 For this reason, instructions are not linked nor explicited.
 Anonymity is key.
 
-The code and entry point lies in [mower.py](mower.py),
-the tests in [test_mower.py](test_mower.py).  
-
 ## Setup
 
 * Clone the repository:
@@ -74,6 +71,7 @@ Tox outputs the coverage at the end.
 
 Get more details about the coverage after running tox:
 ```
+cd tests/
 coverage html
 ```
 
