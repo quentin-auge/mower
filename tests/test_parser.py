@@ -1,22 +1,22 @@
 import io
-
 import pytest
 
-import mower.parser
+from mower import parser
+from mower.mower import Mower
 
 
 def expect_value_or_exception(func, *args, expected):
     """
-    Run a given function of module :module:`mower.parser` with some args.
+    Run a given function of module :module:`parser` with some args.
     Expect either a value or an exception.
     """
 
-    run_func = lambda: getattr(mower.parser, func)(*args)
+    run_func = lambda: getattr(parser, func)(*args)
 
     if isinstance(expected, Exception):
         # Expect an exception
         with pytest.raises(type(expected), match=str(expected)):
-            run_func()
+            print(run_func())
     else:
         # Expect a value
         assert run_func() == expected
@@ -30,19 +30,6 @@ def expect_value_or_exception(func, *args, expected):
 ])
 def test_parse_two_points(x, y, expected):
     expect_value_or_exception('_parse_two_points', x, y, expected=expected)
-
-
-@pytest.mark.parametrize('token, expected', [
-    pytest.param('N', complex(0, 1), id='valid_north'),
-    pytest.param('S', complex(0, -1), id='valid_south'),
-    pytest.param('W', complex(-1, 0), id='valid_west'),
-    pytest.param('E', complex(1, 0), id='valid_east'),
-    pytest.param('', ValueError('Invalid orientation'), id='invalid_empty_string'),
-    pytest.param('X', ValueError('Invalid orientation'), id='invalid_one_char'),
-    pytest.param('NS', ValueError('Invalid orientation'), id='invalid_multiple_chars')
-])
-def test_parse_orientation(token, expected):
-    expect_value_or_exception('_parse_orientation', token, expected=expected)
 
 
 @pytest.mark.parametrize('token, expected', [
@@ -64,13 +51,26 @@ def test_parse_grid_size_line(line, expected):
     expect_value_or_exception('_parse_grid_size_line', line, expected=expected)
 
 
+def assert_mower_position_and_orientation(mower, expected_attributes):
+    return (mower.x, mower.y, mower.orientation) == expected_attributes
+
+
 @pytest.mark.parametrize('line, expected', [
-    pytest.param('-15 22 W', (complex(-15, 22), complex(-1, 0)), id='valid'),
-    pytest.param('1', ValueError('Invalid initial position'), id='invalid_two_values'),
-    pytest.param('1 2 W 0', ValueError('Invalid initial position'), id='invalid_four_values')
+    pytest.param('-15 22 W', (-15, 22, 'W'), id='valid'),
+    pytest.param('1', ValueError('Invalid initial position or orientation'),
+                 id='invalid_two_values'),
+    pytest.param('1 2 W 0', ValueError('Invalid initial position or orientation'),
+                 id='invalid_four_values')
 ])
-def test_parse_initial_position_line(line, expected):
-    expect_value_or_exception('_parse_initial_position_line', line, expected=expected)
+def test_parse_mower_line(line, expected):
+    if isinstance(expected, Exception):
+        # Expect an exception
+        with pytest.raises(type(expected), match=str(expected)):
+            print(parser._parse_mower_line(line))
+    else:
+        # Expect a value
+        mower = parser._parse_mower_line(line)
+        assert_mower_position_and_orientation(mower, expected)
 
 
 @pytest.mark.parametrize('line, expected', [
@@ -83,26 +83,10 @@ def test_parse_moves_line(line, expected):
     expect_value_or_exception('_parse_moves_line', line, expected=expected)
 
 
-def test_parse_grid_size_from_stream():
+@pytest.mark.parametrize('under_test', ['grid_size', 'mower', 'moves'])
+def test_parse_two_mowers(under_test):
     sample_input = '''5 6
     1 2 N
-    LFLFLFLFF
-    '''
-    stream = io.StringIO(sample_input)
-    assert mower.parser.parse_grid_size(stream) == (5, 6)
-
-
-def test_parse_zero_mower_from_stream():
-    stream = io.StringIO()
-
-    actual_mowers = mower.parser.parse_mowers(stream)
-    expected_mowers = []
-
-    assert actual_mowers == expected_mowers
-
-
-def test_parse_all_mower_from_stream():
-    sample_input = '''1 2 N
     LFLFLFLFF
     3 3 E
     FFRFFRFRRF
@@ -110,42 +94,129 @@ def test_parse_all_mower_from_stream():
 
     stream = io.StringIO(sample_input)
 
-    actual_mowers = mower.parser.parse_mowers(stream)
-    expected_mowers = [
-        (complex(1, 2), complex(0, 1), 'LFLFLFLFF'),
-        (complex(3, 3), complex(1, 0), 'FFRFFRFRRF')
-    ]
+    # Test grid size
+    if under_test == 'grid_size':
+        assert parser.parse_grid_size(stream) == (5, 6)
+    else:
+        # Skip line
+        stream.readline()
 
-    assert actual_mowers == expected_mowers
+    # Test first mower initial position and orientation
+    if under_test == 'mower':
+        mower = parser.parse_mower(stream)
+        assert isinstance(mower, Mower)
+        assert_mower_position_and_orientation(mower, (1, 2, 'N'))
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test first mower moves
+    if under_test == 'moves':
+        assert parser.parse_moves(stream) == 'LFLFLFLFF'
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test second mower initial position and orientation
+    if under_test == 'mower':
+        mower = parser.parse_mower(stream)
+        assert isinstance(mower, Mower)
+        assert_mower_position_and_orientation(mower, (3, 3, 'E'))
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test second mower moves
+    if under_test == 'moves':
+        assert parser.parse_moves(stream) == 'FFRFFRFRRF'
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test no mower is left
+    if under_test == 'mower':
+        mower = parser.parse_mower(stream)
+        assert mower is None
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test no moves are left
+    if under_test == 'moves':
+        moves = parser.parse_moves(stream)
+        assert moves == ''
+    else:
+        # Skip line
+        stream.readline()
 
 
-def test_parse_one_mower_from_stream():
-    sample_input = '''1 2 N
-    LFLFLFLFF
+@pytest.mark.parametrize('under_test', ['grid_size', 'mower', 'moves'])
+def test_parse_no_mower(under_test):
+    sample_input = '''5 6
     '''
 
     stream = io.StringIO(sample_input)
 
-    actual_mowers = mower.parser.parse_mowers(stream)
-    expected_mowers = [
-        (complex(1, 2), complex(0, 1), 'LFLFLFLFF')
-    ]
+    # Test grid size
+    if under_test == 'grid_size':
+        assert parser.parse_grid_size(stream) == (5, 6)
+    else:
+        # Skip line
+        stream.readline()
 
-    assert actual_mowers == expected_mowers
+    # Test no mower is left
+    if under_test == 'mower':
+        mower = parser.parse_mower(stream)
+        assert mower is None
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test no moves are left
+    if under_test == 'moves':
+        moves = parser.parse_moves(stream)
+        assert moves == ''
+    else:
+        # Skip line
+        stream.readline()
 
 
-def test_parse_incomplete_mower_from_stream():
-    sample_input = '''1 2 N
-    LFLFLFLFF
-    3 3 E
+@pytest.mark.parametrize('under_test', ['grid_size', 'mower', 'moves'])
+def test_parse_on_mower_without_moves(under_test):
+    sample_input = '''5 6
+    1 2 N
     '''
 
     stream = io.StringIO(sample_input)
 
-    actual_mowers = mower.parser.parse_mowers(stream)
-    expected_mowers = [
-        (complex(1, 2), complex(0, 1), 'LFLFLFLFF'),
-        (complex(3, 3), complex(1, 0), '')
-    ]
+    # Test grid size
+    if under_test == 'grid_size':
+        assert parser.parse_grid_size(stream) == (5, 6)
+    else:
+        # Skip line
+        stream.readline()
 
-    assert actual_mowers == expected_mowers
+    # Test first mower initial position and orientation
+    if under_test == 'mower':
+        mower = parser.parse_mower(stream)
+        assert isinstance(mower, Mower)
+        assert_mower_position_and_orientation(mower, (1, 2, 'N'))
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test no mower is left
+    if under_test == 'mower':
+        mower = parser.parse_mower(stream)
+        assert mower is None
+    else:
+        # Skip line
+        stream.readline()
+
+    # Test no moves are left
+    if under_test == 'moves':
+        moves = parser.parse_moves(stream)
+        assert moves == ''
+    else:
+        # Skip line
+        stream.readline()

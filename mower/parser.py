@@ -10,7 +10,10 @@ Handle parsing errors by raising :exception:`ValueError` with relevant error mes
 """
 
 import io
-from typing import List, Tuple
+from typing import Tuple
+
+from mower.mower import Mower
+from mower.structs import Orientation, Position
 
 
 def parse_grid_size(stream: io.TextIOBase) -> Tuple[int, int]:
@@ -25,30 +28,33 @@ def parse_grid_size(stream: io.TextIOBase) -> Tuple[int, int]:
     return grid_size
 
 
-def parse_mowers(stream: io.TextIOBase) -> List[Tuple[complex, complex, str]]:
+def parse_mower(stream: io.TextIOBase) -> Mower:
     """
-    Consume remaining lines of stream to get mowers initial position (2 space-separated ints
-    -> complex), initial orientation (N/S/W/E char -> complex) and moves (L/R/F chars).
+    Consume mower initial state (initial position as 2 space-separated ints and initial
+    orientation as N/S/W/E char) from stream.
 
     Args:
         stream: input specification file stream.
     """
 
-    mowers = []
+    line = _readline(stream)
+    if line:
+        mower = _parse_mower_line(line)
+        return mower
+
+
+def parse_moves(stream: io.TextIOBase) -> str:
+    """
+    Consume mower moves (L/R/F chars) from stream.
+
+    Args:
+        stream: input specification file stream.
+    """
 
     line = _readline(stream)
+    moves = _parse_moves_line(line)
 
-    while line:
-        position, orientation = _parse_initial_position_line(line)
-
-        line = _readline(stream)
-        moves = _parse_moves_line(line)
-
-        mowers.append((position, orientation, moves))
-
-        line = _readline(stream)
-
-    return mowers
+    return moves
 
 
 def _readline(stream) -> str:
@@ -75,20 +81,21 @@ def _parse_grid_size_line(line) -> Tuple[int, int]:
     return grid_size
 
 
-def _parse_initial_position_line(line: str) -> Tuple[complex, complex]:
+def _parse_mower_line(line: str) -> Mower:
     """
     Parse and validate initial position (2 space-separated ints) and orientation (N/S/W/E char)
-    to a complex position and complex orientation.
+    of mower.
     """
     try:
         x, y, orientation = line.split(' ')
         x, y = _parse_two_points(x, y)
-        position = complex(x, y)
-        orientation = _parse_orientation(orientation)
+        position = Position(x, y)
+        orientation = Orientation(orientation)
     except ValueError:
-        raise ValueError(f'Invalid initial position: "{line}"')
-
-    return position, orientation
+        raise ValueError(f'Invalid initial position or orientation: "{line}"')
+    else:
+        mower = Mower(position, orientation)
+        return mower
 
 
 def _parse_two_points(x: str, y: str) -> Tuple[int, int]:
@@ -104,28 +111,6 @@ def _parse_two_points(x: str, y: str) -> Tuple[int, int]:
     return x, y
 
 
-def _parse_orientation(token: str) -> complex:
-    """
-    Parse and validate an orientation (N/S/W/E char) to a complex.
-    """
-
-    orientation_mapping = {
-        'W': complex(-1, 0),
-        'E': complex(1, 0),
-        'N': complex(0, 1),
-        'S': complex(0, -1)
-    }
-
-    try:
-        orientation = orientation_mapping[token]
-    except KeyError:
-        valid_orientation_tokens = list(orientation_mapping.keys())
-        msg = f'Invalid orientation token: "{token}"; not one of {valid_orientation_tokens}'
-        raise ValueError(msg)
-
-    return orientation
-
-
 def _parse_moves_line(line: str) -> str:
     """
     Validate and return moves specification (concatenated one-char moves).
@@ -133,7 +118,7 @@ def _parse_moves_line(line: str) -> str:
     try:
         moves = ''.join(_parse_move(move) for move in line)
     except ValueError:
-        raise ValueError(f'Invalid moves: {line}')
+        raise ValueError(f'Invalid moves: "{line}"')
 
     return moves
 
@@ -146,7 +131,7 @@ def _parse_move(token: str) -> str:
     valid_move_tokens = 'LRF'
 
     if token not in valid_move_tokens:
-        msg = f'Invalid move token: {token}; not one of {list(valid_move_tokens)}'
+        msg = f'Invalid move token: "{token}"; not one of {list(valid_move_tokens)}'
         raise ValueError(msg)
 
     return token
