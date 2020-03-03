@@ -1,6 +1,7 @@
 """
 A set of helper structs.
 """
+from typing import Tuple
 
 
 class Orientation:
@@ -71,6 +72,15 @@ class Position:
         """
         self.cplx_position += orientation.cplx_orientation
 
+    def restrict_to_grid(self, grid_size: Tuple[int, int]):
+        """
+        Bring back position inside of grid, if needed.
+        """
+        max_x, max_y = grid_size
+        x = max(0, min(self.x, max_x - 1))
+        y = max(0, min(self.y, max_y - 1))
+        self.cplx_position = complex(x, y)
+
     def __str__(self):
         return f'{self.x} {self.y}'
 
@@ -80,9 +90,19 @@ class Mower:
     A structure that encapsulates a mower's position and orientation.
     """
 
-    def __init__(self, position: Position, orientation: Orientation):
+    def __init__(self, position: Position, orientation: Orientation, grid_size: Tuple[int, int]):
         self._position = position
         self._orientation = orientation
+        self._grid_size = grid_size
+
+        # Force initial position inside grid
+        self._restrict_position_to_grid()
+
+    def _restrict_position_to_grid(self):
+        """
+        Bring back position inside of grid, if needed.
+        """
+        self._position.restrict_to_grid(self._grid_size)
 
     @property
     def x(self):

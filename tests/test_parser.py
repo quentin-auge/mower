@@ -66,10 +66,10 @@ def test_parse_mower_line(line, expected):
     if isinstance(expected, Exception):
         # Expect an exception
         with pytest.raises(type(expected), match=str(expected)):
-            print(parser._parse_mower_line(line))
+            print(parser._parse_mower_line(line, grid_size=(100, 100)))
     else:
         # Expect a value
-        mower = parser._parse_mower_line(line)
+        mower = parser._parse_mower_line(line, grid_size=(100, 100))
         assert_mower_position_and_orientation(mower, expected)
 
 
@@ -94,16 +94,14 @@ def test_parse_two_mowers(under_test):
 
     stream = io.StringIO(sample_input)
 
-    # Test grid size
+    # Get and test grid size
+    grid_size = parser.parse_grid_size(stream)
     if under_test == 'grid_size':
-        assert parser.parse_grid_size(stream) == (5, 6)
-    else:
-        # Skip line
-        stream.readline()
+        assert grid_size == (5, 6)
 
     # Test first mower initial position and orientation
     if under_test == 'mower':
-        mower = parser.parse_mower(stream)
+        mower = parser.parse_mower(stream, grid_size)
         assert isinstance(mower, Mower)
         assert_mower_position_and_orientation(mower, (1, 2, 'N'))
     else:
@@ -119,7 +117,7 @@ def test_parse_two_mowers(under_test):
 
     # Test second mower initial position and orientation
     if under_test == 'mower':
-        mower = parser.parse_mower(stream)
+        mower = parser.parse_mower(stream, grid_size)
         assert isinstance(mower, Mower)
         assert_mower_position_and_orientation(mower, (3, 3, 'E'))
     else:
@@ -135,7 +133,7 @@ def test_parse_two_mowers(under_test):
 
     # Test no mower is left
     if under_test == 'mower':
-        mower = parser.parse_mower(stream)
+        mower = parser.parse_mower(stream, grid_size)
         assert mower is None
     else:
         # Skip line
@@ -157,16 +155,14 @@ def test_parse_no_mower(under_test):
 
     stream = io.StringIO(sample_input)
 
-    # Test grid size
+    # Get and test grid size
+    grid_size = parser.parse_grid_size(stream)
     if under_test == 'grid_size':
-        assert parser.parse_grid_size(stream) == (5, 6)
-    else:
-        # Skip line
-        stream.readline()
+        assert grid_size == (5, 6)
 
     # Test no mower is left
     if under_test == 'mower':
-        mower = parser.parse_mower(stream)
+        mower = parser.parse_mower(stream, grid_size)
         assert mower is None
     else:
         # Skip line
@@ -189,16 +185,14 @@ def test_parse_on_mower_without_moves(under_test):
 
     stream = io.StringIO(sample_input)
 
-    # Test grid size
+    # Get and test grid size
+    grid_size = parser.parse_grid_size(stream)
     if under_test == 'grid_size':
-        assert parser.parse_grid_size(stream) == (5, 6)
-    else:
-        # Skip line
-        stream.readline()
+        assert grid_size == (5, 6)
 
     # Test first mower initial position and orientation
     if under_test == 'mower':
-        mower = parser.parse_mower(stream)
+        mower = parser.parse_mower(stream, grid_size)
         assert isinstance(mower, Mower)
         assert_mower_position_and_orientation(mower, (1, 2, 'N'))
     else:
@@ -207,7 +201,7 @@ def test_parse_on_mower_without_moves(under_test):
 
     # Test no mower is left
     if under_test == 'mower':
-        mower = parser.parse_mower(stream)
+        mower = parser.parse_mower(stream, grid_size)
         assert mower is None
     else:
         # Skip line

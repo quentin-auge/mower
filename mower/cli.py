@@ -17,12 +17,12 @@ def main():
 
         all_mowers, all_moves = [], []
 
-        mower = parse_mower(f)
+        mower = parse_mower(f, grid_size)
         while mower:
             moves = parse_moves(f)
             all_mowers.append(mower)
             all_moves.append(moves)
-            mower = parse_mower(f)
+            mower = parse_mower(f, grid_size)
 
     LOGGER.debug(f'Parsed grid size: {grid_size}')
     LOGGER.debug(f'Parsed mowers: {list(map(str, all_mowers))}')

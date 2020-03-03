@@ -1,6 +1,6 @@
 import pytest
 
-from mower.structs import Orientation, Position, Mower
+from mower.structs import Mower, Orientation, Position
 
 
 def test_init_position():
@@ -78,13 +78,34 @@ def test_rotate_orientation(src_orientation, rotate_method, dst_orientation):
     assert orientation.orientation == dst_orientation
 
 
-def test_mower_initialization():
-    mower = Mower(Position(1, 2), Orientation('W'))
-    assert mower.x == 1
-    assert mower.y == 2
+def test_mower_initialization_inside_grid():
+    mower = Mower(Position(8, 9), Orientation('W'), grid_size=(10, 10))
+    assert (mower.x, mower.y) == (8, 9)
+    assert mower.orientation == 'W'
+
+
+def test_mower_initialization_outside_grid():
+    mower = Mower(Position(16, 12), Orientation('W'), grid_size=(10, 10))
+    assert (mower.x, mower.y) == (9, 9)
     assert mower.orientation == 'W'
 
 
 def test_str_mower():
-    mower = Mower(Position(1, 2), Orientation('W'))
-    assert str(mower) == '1 2 W'
+    mower = Mower(Position(8, 9), Orientation('W'), grid_size=(10, 10))
+    assert str(mower) == '8 9 W'
+
+
+@pytest.mark.parametrize('src_position, grid_size, dst_position', [
+    pytest.param((0, 0), (10, 5), (0, 0), id='valid_bottom_left_corner'),
+    pytest.param((0, 4), (10, 5), (0, 4), id='valid_top_left_corner'),
+    pytest.param((9, 4), (10, 5), (9, 4), id='valid_top_right_corner'),
+    pytest.param((9, 0), (10, 5), (9, 0), id='valid_bottom_right_corner'),
+    pytest.param((0, -1), (10, 5), (0, 0), id='invalid_bottom'),
+    pytest.param((-1, 4), (10, 5), (0, 4), id='invalid_left'),
+    pytest.param((9, 5), (10, 5), (9, 4), id='invalid_top'),
+    pytest.param((10, 0), (10, 5), (9, 0), id='invalid_right')
+])
+def test_restrict_position_to_grid(src_position, grid_size, dst_position):
+    position = Position(*src_position)
+    position.restrict_to_grid(grid_size)
+    assert (position.x, position.y) == dst_position

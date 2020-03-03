@@ -12,7 +12,7 @@ Handle parsing errors by raising :exception:`ValueError` with relevant error mes
 import io
 from typing import Tuple
 
-from mower.structs import Orientation, Position, Mower
+from mower.structs import Mower, Orientation, Position
 
 
 def parse_grid_size(stream: io.TextIOBase) -> Tuple[int, int]:
@@ -27,7 +27,7 @@ def parse_grid_size(stream: io.TextIOBase) -> Tuple[int, int]:
     return grid_size
 
 
-def parse_mower(stream: io.TextIOBase) -> Mower:
+def parse_mower(stream: io.TextIOBase, grid_size: Tuple[int, int]) -> Mower:
     """
     Consume mower initial state (initial position as 2 space-separated ints and initial
     orientation as N/S/W/E char) from stream.
@@ -38,7 +38,7 @@ def parse_mower(stream: io.TextIOBase) -> Mower:
 
     line = _readline(stream)
     if line:
-        mower = _parse_mower_line(line)
+        mower = _parse_mower_line(line, grid_size)
         return mower
 
 
@@ -80,7 +80,7 @@ def _parse_grid_size_line(line) -> Tuple[int, int]:
     return grid_size
 
 
-def _parse_mower_line(line: str) -> Mower:
+def _parse_mower_line(line: str, grid_size: Tuple[int, int]) -> Mower:
     """
     Parse and validate initial position (2 space-separated ints) and orientation (N/S/W/E char)
     of mower.
@@ -93,7 +93,7 @@ def _parse_mower_line(line: str) -> Mower:
     except ValueError:
         raise ValueError(f'Invalid initial position or orientation: "{line}"')
     else:
-        mower = Mower(position, orientation)
+        mower = Mower(position, orientation, grid_size)
         return mower
 
 
