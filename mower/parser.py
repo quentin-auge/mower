@@ -13,9 +13,9 @@ import io
 from typing import List, Tuple
 
 
-def parse_grid_size(stream: io.TextIOBase) -> complex:
+def parse_grid_size(stream: io.TextIOBase) -> Tuple[int, int]:
     """
-    Consume first line of stream to get grid size (2 space-separated ints -> complex).
+    Consume grid size (2 space-separated ints) from stream.
 
     Args:
         stream: input specification file stream.
@@ -62,13 +62,13 @@ def _readline(stream) -> str:
     return line
 
 
-def _parse_grid_size_line(line) -> complex:
+def _parse_grid_size_line(line) -> Tuple[int, int]:
     """
-    Parse and validate a grid size specification (2 space-separated ints) to a complex.
+    Parse and validate a grid size specification (2 space-separated ints).
     """
     try:
         x, y = line.split(' ')
-        grid_size = _parse_position(x, y)
+        grid_size = _parse_two_points(x, y)
     except ValueError:
         raise ValueError(f'Invalid grid size: "{line}"')
 
@@ -82,7 +82,8 @@ def _parse_initial_position_line(line: str) -> Tuple[complex, complex]:
     """
     try:
         x, y, orientation = line.split(' ')
-        position = _parse_position(x, y)
+        x, y = _parse_two_points(x, y)
+        position = complex(x, y)
         orientation = _parse_orientation(orientation)
     except ValueError:
         raise ValueError(f'Invalid initial position: "{line}"')
@@ -90,9 +91,9 @@ def _parse_initial_position_line(line: str) -> Tuple[complex, complex]:
     return position, orientation
 
 
-def _parse_position(x: str, y: str) -> complex:
+def _parse_two_points(x: str, y: str) -> Tuple[int, int]:
     """
-    Parse and validate a position (two strings interepretable as ints) to a complex.
+    Parse and validate a position (two strings interpretable as ints).
     """
     try:
         x, y = int(x), int(y)
@@ -100,7 +101,7 @@ def _parse_position(x: str, y: str) -> complex:
         msg = f'Invalid position: "{(x, y)}", must be integers'
         raise ValueError(msg)
 
-    return complex(x, y)
+    return x, y
 
 
 def _parse_orientation(token: str) -> complex:

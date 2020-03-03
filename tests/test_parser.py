@@ -23,13 +23,13 @@ def expect_value_or_exception(func, *args, expected):
 
 
 @pytest.mark.parametrize('x, y, expected', [
-    pytest.param('-15', '22', complex(-15, 22), id='valid'),
+    pytest.param('-15', '22', (-15, 22), id='valid'),
     pytest.param('9', '', ValueError('Invalid position'), id='invalid_empty_string'),
     pytest.param('19b', '3', ValueError('Invalid position'), id='invalid_string'),
     pytest.param('1.4', '3', ValueError('Invalid position'), id='invalid_float')
 ])
-def test_parse_position(x, y, expected):
-    expect_value_or_exception('_parse_position', x, y, expected=expected)
+def test_parse_two_points(x, y, expected):
+    expect_value_or_exception('_parse_two_points', x, y, expected=expected)
 
 
 @pytest.mark.parametrize('token, expected', [
@@ -56,7 +56,7 @@ def test_parse_move(token, expected):
 
 
 @pytest.mark.parametrize('line, expected', [
-    pytest.param('-15 22', complex(-15, 22), id='valid'),
+    pytest.param('-15 22', (-15, 22), id='valid'),
     pytest.param('1', ValueError('Invalid grid size'), id='invalid_single_value'),
     pytest.param('1 2 3', ValueError('Invalid grid size'), id='invalid_three_values')
 ])
@@ -84,12 +84,12 @@ def test_parse_moves_line(line, expected):
 
 
 def test_parse_grid_size_from_stream():
-    sample_input = '''5 5
+    sample_input = '''5 6
     1 2 N
     LFLFLFLFF
     '''
     stream = io.StringIO(sample_input)
-    assert mower.parser.parse_grid_size(stream) == complex(5, 5)
+    assert mower.parser.parse_grid_size(stream) == (5, 6)
 
 
 def test_parse_zero_mower_from_stream():
