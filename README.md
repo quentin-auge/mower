@@ -1,6 +1,11 @@
-# Mower technical test
+# Lawn mowers technical test
 
-The code runs with Python >= 3.6.
+The code runs with Python >= 3.6. It does not have any production
+dependency, relying exclusively on standard library.  
+It is locally pip-installable, exposing a `mower` command line tool,
+complete with debug mode.  
+Internal libraries powering the project are fully tested
+(coverage = 100%).
 
 It is an implementation of a company's technical test.  
 For this reason, instructions are not linked nor explicited.
@@ -45,18 +50,55 @@ $ mower ./sample_input.txt
 5 1 E
 ```
 
+Debug mode:
+```
+$ mower -v ./sample_input.txt
+DEBUG:mower.cli: Parsed grid size: (5, 5)
+DEBUG:mower.cli: Parsed mowers: ['1 2 N', '3 3 E']
+DEBUG:mower.cli: Parsed moves: ['LFLFLFLFF', 'FFRFFRFRRF']
+DEBUG:mower.cli:
+DEBUG:mower.cli: Mower 1
+DEBUG:mower.cli:   1 2 N
+DEBUG:mower.cli: L 1 2 W
+DEBUG:mower.cli: F 0 2 W
+DEBUG:mower.cli: L 0 2 S
+DEBUG:mower.cli: F 0 1 S
+DEBUG:mower.cli: L 0 1 E
+DEBUG:mower.cli: F 1 1 E
+DEBUG:mower.cli: L 1 1 N
+DEBUG:mower.cli: F 1 2 N
+DEBUG:mower.cli: F 1 3 N
+DEBUG:mower.cli:
+DEBUG:mower.cli: Mower 2
+DEBUG:mower.cli:   3 3 E
+DEBUG:mower.cli: F 4 3 E
+DEBUG:mower.cli: F 5 3 E
+DEBUG:mower.cli: R 5 3 S
+DEBUG:mower.cli: F 5 2 S
+DEBUG:mower.cli: F 5 1 S
+DEBUG:mower.cli: R 5 1 W
+DEBUG:mower.cli: F 4 1 W
+DEBUG:mower.cli: R 4 1 N
+DEBUG:mower.cli: R 4 1 E
+DEBUG:mower.cli: F 5 1 E
+DEBUG:mower.cli:
+1 3 N
+5 1 E
+```
+
 Usage:
 ```
 $ mower --help
-usage: mower [-h] path
+usage: mower [-h] [--verbose] path
 
-Move a mower around
+Move mowers on a lawn
 
 positional arguments:
-  path        instructions file for moving the mower
+  path           instructions file for moving the mowers on the lawn
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help     show this help message and exit
+  --verbose, -v  debug_mode
 ```
 
 ## Run the tests
@@ -67,12 +109,4 @@ pip install tox
 tox
 ```
 
-Tox outputs the coverage at the end.
-
-Get more details about the coverage after running tox:
-```
-cd tests/
-coverage html
-```
-
-The HTML report can then be found at `htmlcov/index.html`.
+Tox outputs the (branch) coverage at the end.

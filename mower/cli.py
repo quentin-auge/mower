@@ -11,8 +11,8 @@ def main():
 
     # Parse command line
 
-    parser = ArgumentParser(description='Move a mower on a lawn')
-    parser.add_argument('path', help='instructions file for moving the mower')
+    parser = ArgumentParser(description='Move mowers on a lawn')
+    parser.add_argument('path', help='instructions file for moving mowers on the lawn')
     parser.add_argument('--verbose', '-v', action='store_true', help='debug_mode')
     args = parser.parse_args()
 
