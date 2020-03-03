@@ -70,10 +70,15 @@ def _readline(stream) -> str:
 def _parse_grid_size_line(line) -> Tuple[int, int]:
     """
     Parse and validate a grid size specification (2 space-separated ints).
+
+    Notes:
+        Both coordinates must be > 0.
     """
     try:
         x, y = line.split(' ')
-        grid_size = _parse_two_points(x, y)
+        grid_size = _parse_point(x, y)
+        if grid_size[0] <= 0 or grid_size[1] <= 0:
+            raise ValueError(f'Invalid grid size: {(x, y)}, must be integers > 0')
     except ValueError:
         raise ValueError(f'Invalid grid size: "{line}"')
 
@@ -87,24 +92,29 @@ def _parse_mower_line(line: str, grid_size: Tuple[int, int]) -> Mower:
     """
     try:
         x, y, orientation = line.split(' ')
-        x, y = _parse_two_points(x, y)
+        x, y = _parse_point(x, y)
         position = Position(x, y)
         orientation = Orientation(orientation)
     except ValueError:
-        raise ValueError(f'Invalid initial position or orientation: "{line}"')
+        raise ValueError(f'Invalid initial position and orientation: "{line}"')
     else:
         mower = Mower(position, orientation, grid_size)
         return mower
 
 
-def _parse_two_points(x: str, y: str) -> Tuple[int, int]:
+def _parse_point(x: str, y: str) -> Tuple[int, int]:
     """
     Parse and validate a position (two strings interpretable as ints).
+
+    Notes:
+        Both coordinates must be >= 0.
     """
     try:
         x, y = int(x), int(y)
+        if x < 0 or y < 0:
+            raise ValueError(f'Invalid position: {(x, y)}, must be integers >= 0')
     except ValueError:
-        msg = f'Invalid position: "{(x, y)}", must be integers'
+        msg = f'Invalid position: {(x, y)}, must be integers >= 0'
         raise ValueError(msg)
 
     return x, y

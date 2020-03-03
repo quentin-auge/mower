@@ -23,13 +23,17 @@ def expect_value_or_exception(func, *args, expected):
 
 
 @pytest.mark.parametrize('x, y, expected', [
-    pytest.param('-15', '22', (-15, 22), id='valid'),
+    pytest.param('15', '22', (15, 22), id='valid_positive'),
+    pytest.param('0', '0', (0, 0), id='valid_zero'),
+    pytest.param('-15', '22', ValueError('Invalid position'), id='invalid_negative_x'),
+    pytest.param('-15', '-22', ValueError('Invalid position'), id='invalid_negative_y'),
+    pytest.param('-15', '-22', ValueError('Invalid position'), id='invalid_negative_xy'),
     pytest.param('9', '', ValueError('Invalid position'), id='invalid_empty_string'),
     pytest.param('19b', '3', ValueError('Invalid position'), id='invalid_string'),
     pytest.param('1.4', '3', ValueError('Invalid position'), id='invalid_float')
 ])
-def test_parse_two_points(x, y, expected):
-    expect_value_or_exception('_parse_two_points', x, y, expected=expected)
+def test_parse_point(x, y, expected):
+    expect_value_or_exception('_parse_point', x, y, expected=expected)
 
 
 @pytest.mark.parametrize('token, expected', [
@@ -43,7 +47,10 @@ def test_parse_move(token, expected):
 
 
 @pytest.mark.parametrize('line, expected', [
-    pytest.param('-15 22', (-15, 22), id='valid'),
+    pytest.param('15 22', (15, 22), id='valid'),
+    pytest.param('1 0', ValueError('Invalid grid size'), id='invalid_zero_x'),
+    pytest.param('1 0', ValueError('Invalid grid size'), id='invalid_zero_y'),
+    pytest.param('0 0', ValueError('Invalid grid size'), id='invalid_zero_xy'),
     pytest.param('1', ValueError('Invalid grid size'), id='invalid_single_value'),
     pytest.param('1 2 3', ValueError('Invalid grid size'), id='invalid_three_values')
 ])
@@ -56,10 +63,10 @@ def assert_mower_position_and_orientation(mower, expected_attributes):
 
 
 @pytest.mark.parametrize('line, expected', [
-    pytest.param('-15 22 W', (-15, 22, 'W'), id='valid'),
-    pytest.param('1', ValueError('Invalid initial position or orientation'),
+    pytest.param('15 22 W', (15, 22, 'W'), id='valid'),
+    pytest.param('1', ValueError('Invalid initial position and orientation'),
                  id='invalid_two_values'),
-    pytest.param('1 2 W 0', ValueError('Invalid initial position or orientation'),
+    pytest.param('1 2 W 0', ValueError('Invalid initial position and orientation'),
                  id='invalid_four_values')
 ])
 def test_parse_mower_line(line, expected):
