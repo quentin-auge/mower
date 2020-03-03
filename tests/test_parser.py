@@ -40,7 +40,7 @@ def test_parse_point(x, y, expected):
     pytest.param('L', 'L', id='valid_left'),
     pytest.param('R', 'R', id='valid_right'),
     pytest.param('F', 'F', id='valid_forward'),
-    pytest.param('X', ValueError('Invalid move'), id='invalid_one_char')
+    pytest.param('X', ValueError('Invalid move'), id='invalid_token')
 ])
 def test_parse_move(token, expected):
     expect_value_or_exception('_parse_move', token, expected=expected)

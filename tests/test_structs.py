@@ -1,3 +1,4 @@
+import mock
 import pytest
 
 from mower.structs import Mower, Orientation, Position
@@ -23,7 +24,9 @@ def test_forward_position(orientation, dst_position):
     position = Position(1, 2)
     orientation = Orientation(orientation)
 
-    position.forward(orientation)
+    with mock.patch.object(position, 'restrict_to_grid') as restrict_to_grid:
+        position.forward(orientation, grid_size=(100, 100))
+        restrict_to_grid.assert_called_once()
 
     assert (position.x, position.y) == dst_position
 
@@ -78,15 +81,14 @@ def test_rotate_orientation(src_orientation, rotate_method, dst_orientation):
     assert orientation.orientation == dst_orientation
 
 
-def test_mower_initialization_inside_grid():
-    mower = Mower(Position(8, 9), Orientation('W'), grid_size=(10, 10))
+def test_mower_initialization():
+    position = Position(8, 9)
+
+    with mock.patch.object(position, 'restrict_to_grid') as restrict_to_grid:
+        mower = Mower(position, Orientation('W'), grid_size=(10, 10))
+        restrict_to_grid.assert_called_once()
+
     assert (mower.x, mower.y) == (8, 9)
-    assert mower.orientation == 'W'
-
-
-def test_mower_initialization_outside_grid():
-    mower = Mower(Position(16, 12), Orientation('W'), grid_size=(10, 10))
-    assert (mower.x, mower.y) == (9, 9)
     assert mower.orientation == 'W'
 
 

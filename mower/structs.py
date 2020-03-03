@@ -66,11 +66,12 @@ class Position:
     def y(self) -> int:
         return int(self.cplx_position.imag)
 
-    def forward(self, orientation: Orientation):
+    def forward(self, orientation: Orientation, grid_size: Tuple[int, int]):
         """
         Move position 1 unit along a given orientation.
         """
         self.cplx_position += orientation.cplx_orientation
+        self.restrict_to_grid(grid_size)
 
     def restrict_to_grid(self, grid_size: Tuple[int, int]):
         """
@@ -96,12 +97,6 @@ class Mower:
         self._grid_size = grid_size
 
         # Force initial position inside grid
-        self._restrict_position_to_grid()
-
-    def _restrict_position_to_grid(self):
-        """
-        Bring back position inside of grid, if needed.
-        """
         self._position.restrict_to_grid(self._grid_size)
 
     @property
