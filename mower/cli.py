@@ -24,10 +24,27 @@ def main():
             all_moves.append(moves)
             mower = parse_mower(f, grid_size)
 
-    LOGGER.debug(f'Parsed grid size: {grid_size}')
-    LOGGER.debug(f'Parsed mowers: {list(map(str, all_mowers))}')
-    LOGGER.debug(f'Parsed moves: {all_moves}')
+    LOGGER.debug(f' Parsed grid size: {grid_size}')
+    LOGGER.debug(f' Parsed mowers: {list(map(str, all_mowers))}')
+    LOGGER.debug(f' Parsed moves: {all_moves}')
+    LOGGER.debug('')
 
+    # Execute moves
+
+    for i, (mower, moves) in enumerate(zip(all_mowers, all_moves), 1):
+        LOGGER.debug(f' Mower {i}')
+        LOGGER.debug(f'   {mower}')
+
+        for move in moves:
+            mower.step(move)
+            LOGGER.debug(f' {move} {mower}')
+
+        LOGGER.debug('')
+
+    # Print result
+
+    for mower in all_mowers:
+        print(mower)
 
 if __name__ == '__main__':
     main()
