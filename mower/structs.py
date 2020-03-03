@@ -51,5 +51,19 @@ class Orientation:
     def orientation(self):
         return self.complex_to_orientation[self.cplx_orientation]
 
+    def rotate_left(self):
+        """
+        Perform 1/4 counter-clockwise rotation of orientation.
+        """
+        # Multiply the orientation by j = exp(j * pi / 2) in the complex plane
+        self.cplx_orientation *= complex(0, 1)
+
+    def rotate_right(self):
+        """
+        Perform 1/4 clockwise rotation of orientation.
+        """
+        # Multiply the orientation by -j = exp(-j * pi / 2) in the complex plane
+        self.cplx_orientation *= complex(0, -1)
+
     def __str__(self):
         return self.orientation

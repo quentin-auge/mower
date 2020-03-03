@@ -37,3 +37,27 @@ def test_init_orientation(orientation, expected):
 @pytest.mark.parametrize('orientation', ['N', 'S', 'W', 'E'])
 def test_str_orientation(orientation):
     assert str(Orientation(orientation)) == orientation
+
+
+@pytest.mark.parametrize('src_orientation, rotate_method, dst_orientation', [
+    pytest.param('N', 'rotate_left', 'W', id='rotate_left_N'),
+    pytest.param('S', 'rotate_left', 'E', id='rotate_left_S'),
+    pytest.param('W', 'rotate_left', 'S', id='rotate_left_W'),
+    pytest.param('E', 'rotate_left', 'N', id='rotate_left_E'),
+    pytest.param('N', 'rotate_right', 'E', id='rotate_right_N'),
+    pytest.param('S', 'rotate_right', 'W', id='rotate_right_S'),
+    pytest.param('W', 'rotate_right', 'N', id='rotate_right_W'),
+    pytest.param('E', 'rotate_right', 'S', id='rotate_right_E'),
+])
+def test_rotate_orientation(src_orientation, rotate_method, dst_orientation):
+    orientation = Orientation(src_orientation)
+
+    # Check base orientation
+    assert orientation.orientation == src_orientation
+
+    # Rotate left or right
+    rotate_method = getattr(orientation, rotate_method)
+    rotate_method()
+
+    # Check orientation after rotation
+    assert orientation.orientation == dst_orientation
