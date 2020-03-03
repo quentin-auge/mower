@@ -2,7 +2,6 @@
 A set of helper structs.
 """
 
-from typing import Union
 
 class Position:
     """
@@ -10,16 +9,16 @@ class Position:
     upon it.
     """
 
-    def __init__(self, x: Union[str, int], y: Union[str, int]):
-        self._position = complex(x, y)
+    def __init__(self, x: int, y: int):
+        self.cplx_position = complex(x, y)
 
     @property
     def x(self):
-        return int(self._position.real)
+        return int(self.cplx_position.real)
 
     @property
     def y(self):
-        return int(self._position.imag)
+        return int(self.cplx_position.imag)
 
     def __str__(self):
         return f'{self.x} {self.y}'
@@ -42,7 +41,7 @@ class Orientation:
 
     def __init__(self, orientation: str):
         try:
-            self._orientation = self.orientation_to_complex[orientation]
+            self.cplx_orientation = self.orientation_to_complex[orientation]
         except KeyError:
             valid_orientations = list(self.orientation_to_complex.keys())
             msg = f'Invalid orientation: "{orientation}"; not one of {valid_orientations}'
@@ -50,7 +49,7 @@ class Orientation:
 
     @property
     def orientation(self):
-        return self.complex_to_orientation[self._orientation]
+        return self.complex_to_orientation[self.cplx_orientation]
 
     def __str__(self):
         return self.orientation

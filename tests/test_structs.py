@@ -5,7 +5,7 @@ from mower.structs import Orientation, Position
 
 def test_init_position():
     position = Position(-7, 8)
-    assert position._position == complex(-7, 8)
+    assert position.cplx_position == complex(-7, 8)
     assert (position.x, position.y) == (-7, 8)
 
 
@@ -30,7 +30,7 @@ def test_init_orientation(orientation, expected):
     else:
         # Expect a successful initialization with the right attribute
         orientation_obj = Orientation(orientation)
-        assert orientation_obj._orientation == expected
+        assert orientation_obj.cplx_orientation == expected
         assert orientation_obj.orientation == orientation
 
 
