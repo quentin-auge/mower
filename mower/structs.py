@@ -3,27 +3,6 @@ A set of helper structs.
 """
 
 
-class Position:
-    """
-    A pretty-printable structure that encapsulates a cartesian-coordinates position and operates
-    upon it.
-    """
-
-    def __init__(self, x: int, y: int):
-        self.cplx_position = complex(x, y)
-
-    @property
-    def x(self):
-        return int(self.cplx_position.real)
-
-    @property
-    def y(self):
-        return int(self.cplx_position.imag)
-
-    def __str__(self):
-        return f'{self.x} {self.y}'
-
-
 class Orientation:
     """
     A pretty-printable structure that encapsulates a N/S/W/E orientation and operates upon it.
@@ -48,7 +27,7 @@ class Orientation:
             raise ValueError(msg)
 
     @property
-    def orientation(self):
+    def orientation(self) -> str:
         return self.complex_to_orientation[self.cplx_orientation]
 
     def rotate_left(self):
@@ -67,3 +46,30 @@ class Orientation:
 
     def __str__(self):
         return self.orientation
+
+
+class Position:
+    """
+    A pretty-printable structure that encapsulates a cartesian-coordinates position and operates
+    upon it.
+    """
+
+    def __init__(self, x: int, y: int):
+        self.cplx_position = complex(x, y)
+
+    @property
+    def x(self) -> int:
+        return int(self.cplx_position.real)
+
+    @property
+    def y(self) -> int:
+        return int(self.cplx_position.imag)
+
+    def forward(self, orientation: Orientation):
+        """
+        Move position 1 unit along a given orientation.
+        """
+        self.cplx_position += orientation.cplx_orientation
+
+    def __str__(self):
+        return f'{self.x} {self.y}'

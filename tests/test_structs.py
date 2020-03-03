@@ -13,6 +13,21 @@ def test_str_position():
     assert str(Position(1, -2)) == '1 -2'
 
 
+@pytest.mark.parametrize('orientation, dst_position', [
+    pytest.param('N', (1, 3), id='N'),
+    pytest.param('S', (1, 1), id='S'),
+    pytest.param('W', (0, 2), id='W'),
+    pytest.param('E', (2, 2), id='E')
+])
+def test_forward_position(orientation, dst_position):
+    position = Position(1, 2)
+    orientation = Orientation(orientation)
+
+    position.forward(orientation)
+
+    assert (position.x, position.y) == dst_position
+
+
 @pytest.mark.parametrize('orientation, expected', [
     pytest.param('N', complex(0, 1), id='valid_north'),
     pytest.param('S', complex(0, -1), id='valid_south'),
