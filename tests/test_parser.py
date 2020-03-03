@@ -2,7 +2,7 @@ import io
 import pytest
 
 from mower import parser
-from mower.mower import Mower
+from mower.structs import Mower
 
 
 def expect_value_or_exception(func, *args, expected):

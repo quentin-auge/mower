@@ -22,6 +22,6 @@ setup(name='mower',
 
       entry_points={
           'console_scripts': [
-              'mower = mower.mower:main'
+              'mower = mower.cli:main'
           ]
       })

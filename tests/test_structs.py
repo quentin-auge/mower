@@ -1,6 +1,6 @@
 import pytest
 
-from mower.structs import Orientation, Position
+from mower.structs import Orientation, Position, Mower
 
 
 def test_init_position():
@@ -76,3 +76,15 @@ def test_rotate_orientation(src_orientation, rotate_method, dst_orientation):
 
     # Check orientation after rotation
     assert orientation.orientation == dst_orientation
+
+
+def test_mower_initialization():
+    mower = Mower(Position(1, 2), Orientation('W'))
+    assert mower.x == 1
+    assert mower.y == 2
+    assert mower.orientation == 'W'
+
+
+def test_str_mower():
+    mower = Mower(Position(1, 2), Orientation('W'))
+    assert str(mower) == '1 2 W'

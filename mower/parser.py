@@ -12,8 +12,7 @@ Handle parsing errors by raising :exception:`ValueError` with relevant error mes
 import io
 from typing import Tuple
 
-from mower.mower import Mower
-from mower.structs import Orientation, Position
+from mower.structs import Orientation, Position, Mower
 
 
 def parse_grid_size(stream: io.TextIOBase) -> Tuple[int, int]:
