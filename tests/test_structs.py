@@ -32,14 +32,14 @@ def test_forward_position(orientation, dst_position):
 
 
 @pytest.mark.parametrize('src_position, grid_size, dst_position', [
-    pytest.param((0, 0), (10, 5), (0, 0), id='valid_bottom_left_corner'),
-    pytest.param((0, 4), (10, 5), (0, 4), id='valid_top_left_corner'),
-    pytest.param((9, 4), (10, 5), (9, 4), id='valid_top_right_corner'),
-    pytest.param((9, 0), (10, 5), (9, 0), id='valid_bottom_right_corner'),
-    pytest.param((0, -1), (10, 5), (0, 0), id='invalid_bottom'),
-    pytest.param((-1, 4), (10, 5), (0, 4), id='invalid_left'),
-    pytest.param((9, 5), (10, 5), (9, 4), id='invalid_top'),
-    pytest.param((10, 0), (10, 5), (9, 0), id='invalid_right')
+    pytest.param((0, 0), (9, 4), (0, 0), id='inside_bottom_left_corner'),
+    pytest.param((0, 4), (9, 4), (0, 4), id='inside_top_left_corner'),
+    pytest.param((9, 4), (9, 4), (9, 4), id='inside_top_right_corner'),
+    pytest.param((9, 0), (9, 4), (9, 0), id='inside_bottom_right_corner'),
+    pytest.param((0, -1), (9, 4), (0, 0), id='outside_bottom_left_corner'),
+    pytest.param((-1, 4), (9, 4), (0, 4), id='outside_top_left_corner'),
+    pytest.param((9, 5), (9, 4), (9, 4), id='outside_top_right_corner'),
+    pytest.param((10, 0), (9, 4), (9, 0), id='outside_bottom_right_corner')
 ])
 def test_restrict_position_to_grid(src_position, grid_size, dst_position):
     position = Position(*src_position)

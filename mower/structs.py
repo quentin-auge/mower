@@ -78,8 +78,8 @@ class Position:
         Bring back position inside of grid, if needed.
         """
         max_x, max_y = grid_size
-        x = max(0, min(self.x, max_x - 1))
-        y = max(0, min(self.y, max_y - 1))
+        x = max(0, min(self.x, max_x))
+        y = max(0, min(self.y, max_y))
         self.cplx_position = complex(x, y)
 
     def __str__(self):

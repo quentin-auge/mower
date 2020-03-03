@@ -48,9 +48,6 @@ def test_parse_move(token, expected):
 
 @pytest.mark.parametrize('line, expected', [
     pytest.param('15 22', (15, 22), id='valid'),
-    pytest.param('1 0', ValueError('Invalid grid size'), id='invalid_zero_x'),
-    pytest.param('1 0', ValueError('Invalid grid size'), id='invalid_zero_y'),
-    pytest.param('0 0', ValueError('Invalid grid size'), id='invalid_zero_xy'),
     pytest.param('1', ValueError('Invalid grid size'), id='invalid_single_value'),
     pytest.param('1 2 3', ValueError('Invalid grid size'), id='invalid_three_values')
 ])

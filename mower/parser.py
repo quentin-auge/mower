@@ -72,13 +72,11 @@ def _parse_grid_size_line(line) -> Tuple[int, int]:
     Parse and validate a grid size specification (2 space-separated ints).
 
     Notes:
-        Both coordinates must be > 0.
+        Both coordinates must be >= 0.
     """
     try:
         x, y = line.split(' ')
         grid_size = _parse_point(x, y)
-        if grid_size[0] <= 0 or grid_size[1] <= 0:
-            raise ValueError(f'Invalid grid size: {(x, y)}, must be integers > 0')
     except ValueError:
         raise ValueError(f'Invalid grid size: "{line}"')
 
