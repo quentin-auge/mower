@@ -1,4 +1,5 @@
 import logging
+from argparse import ArgumentParser
 
 from mower.parser import parse_grid_size, parse_moves, parse_mower
 
@@ -6,13 +7,22 @@ LOGGER = logging.getLogger(__name__)
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
 
-    path = './sample_input.txt'
+
+    # Parse command line
+
+    parser = ArgumentParser(description='Move a mower on a lawn')
+    parser.add_argument('path', help='instructions file for moving the mower')
+    parser.add_argument('--verbose', '-v', action='store_true', help='debug_mode')
+    args = parser.parse_args()
+
+    # Setup logging
+
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
     # Parse input file
 
-    with open(path) as f:
+    with open(args.path) as f:
         grid_size = parse_grid_size(f)
 
         all_mowers, all_moves = [], []
